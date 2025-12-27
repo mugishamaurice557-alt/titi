@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="rw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Random Result Checker - 40% WIN / 60% LOSS</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#eef2f5,#cce0ff);
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:50px 10px 20px;
+    min-height:100vh;
+    margin:0;
+}
+.container{
+    background:#fff;
+    padding:25px;
+    width:100%;
+    max-width:450px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+    animation: slideIn .7s ease-out;
+    position:relative;
+}
+@keyframes slideIn{
+    from{opacity:0; transform:translateY(-30px)}
+    to{opacity:1; transform:translateY(0)}
+}
+h3,h4{text-align:center}
+input,button{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    font-size:16px;
+    border-radius:6px;
+    border:1px solid #ccc;
+}
+button{
+    background:#28a745;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+}
+button:hover{background:#218838}
+.reset-btn{background:#dc3545}
+.reset-btn:hover{background:#c82333}
+.result{
+    margin-top:15px;
+    font-size:28px;
+    font-weight:bold;
+    text-align:center;
+    opacity:0;
+    transition:.4s;
+}
+.result.show{opacity:1}
+.notice{text-align:center;font-size:14px;margin-top:10px}
+ul{list-style:none;padding:0;max-height:250px;overflow:auto}
+li{
+    background:#f4f4f4;
+    margin-bottom:5px;
+    padding:6px 10px;
+    border-radius:6px;
+    font-size:14px;
+}
+.win{color:green;font-weight:bold}
+.loss{color:red;font-weight:bold}
+</style>
+</head>
+
+<body>
+<div class="container">
+    <h3>Shyiramo Umubare</h3>
+
+    <input type="number" step="0.01" id="num" placeholder="Ex: 102.14">
+    <button onclick="check()">Reba Ibisubizo</button>
+    <button class="reset-btn" onclick="deleteHistory()">Siba Amateka (Admin)</button>
+
+    <div class="result" id="res"></div>
+    <div class="notice">Twandikire kuri 0792522881 uhabwe umubare</div>
+
+    <h4>Amateka</h4>
+    <ul id="historyList"></ul>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+<script>
+const allowedNumbers=[
+102.14,150,507.23,100,500.01,200,303.55,409,850.67,
+301.11,600,750.44,120,503.78,400,507,250.99,900,810.12,
+305,204.45,550.3,100.5,870,502.88,500,704.77,801,100.01
+];
+
+let history=JSON.parse(localStorage.getItem("history"))||[];
+let usedNumbers=JSON.parse(localStorage.getItem("usedNumbers"))||[];
+
+function formatDate(d){
+return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()} ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+}
+
+function renderHistory(){
+const ul=document.getElementById("historyList");
+ul.innerHTML="";
+history.slice().reverse().forEach(h=>{
+const li=document.createElement("li");
+li.innerHTML=`${h.date} - ${h.number} :
+<span class="${h.result>0?'win':'loss'}">
+${h.result>0?'WIN '+h.result+' FRW':'LOSS'}
+</span>`;
+ul.appendChild(li);
+});
+}
+
+function confettiShot(){
+confetti({particleCount:80,spread:70,origin:{y:0.6}});
+}
+
+function check(){
+const num=parseFloat(document.getElementById("num").value);
+const res=document.getElementById("res");
+res.classList.remove("show");
+
+setTimeout(()=>{
+if(isNaN(num)){
+res.textContent="Shyiramo umubare wemewe";
+res.style.color="red";
+}
+else if(!allowedNumbers.includes(num)){
+res.textContent="Uyu mubare ntuwemewe";
+res.style.color="red";
+}
+else if(usedNumbers.includes(num)){
+res.textContent="Uyu mubare warakoreshejwe";
+res.style.color="red";
+}
+else{
+let win=Math.random()<=0.4;
+let result=win?Math.floor(Math.random()*5)+1:0;
+res.textContent=win?`WIN ${result} FRW`:`LOSS`;
+res.style.color=win?"green":"red";
+if(win) confettiShot();
+
+history.push({number:num,result:result,date:formatDate(new Date())});
+usedNumbers.push(num);
+localStorage.setItem("history",JSON.stringify(history));
+localStorage.setItem("usedNumbers",JSON.stringify(usedNumbers));
+renderHistory();
+}
+res.classList.add("show");
+},100);
+}
+
+function deleteHistory(){
+if(prompt("Shyiramo admin code")=="20201"){
+history=[];
+usedNumbers=[];
+localStorage.clear();
+renderHistory();
+document.getElementById("res").textContent="Amateka yasibwe";
+}
+}
+renderHistory();
+</script>
+</body>
+</html>
